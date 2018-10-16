@@ -13,7 +13,7 @@ ENV NODEJS_VERSION=6 \
     NPM_RUN=start \
     NPM_CONFIG_PREFIX=$HOME/.npm-global
 
-COPY ["docker_build.sh","/usr/local/bin/docker_build.sh"]
+COPY ["docker_build.sh","/usr/local/bin/docker_build"]
 
 WORKDIR /projects
 
