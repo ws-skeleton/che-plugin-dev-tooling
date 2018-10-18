@@ -17,14 +17,14 @@ export PROJECT_DIR=/projects/${PROJECT_NAME}
 export BUILD_DIR=/tmp
 
 # Pull and unpackl the base image (node:10.7-alpine)
-cd ${BUILD_DIR} || echo "ERROR: Failed to cd /tmp/" && exit
+cd ${BUILD_DIR} || (echo "ERROR: Failed to cd /tmp/" && exit)
 
 skopeo copy docker://node:10.7-alpine oci:${PROJECT_NAME}:latest && \
 umoci unpack --rootless --image ${PROJECT_NAME}:latest bundle
 
 # COPY
 mkdir ${BUILD_DIR}/bundle/rootfs/server && \
-   cp -r ${PROJECT_DIR}/impl/* ${BUILD_DIR}/bundle/rootfs/server/
+   cp -r ${PROJECT_DIR}/service/impl/* ${BUILD_DIR}/bundle/rootfs/server/
 
 # RUN
 cd ${BUILD_DIR}/bundle/rootfs/server/ && \
