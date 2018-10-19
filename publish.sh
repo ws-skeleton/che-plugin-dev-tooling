@@ -18,19 +18,11 @@ REGISTRY=$(oc get svc --field-selector='metadata.name=che-plugin-registry' 2>&1)
 if [[ "$REGISTRY" == "No resources found." ]]; then
   echo "Creating registry..."
   oc new-app eclipse/che-plugin-registry > /dev/null
-fi
-
-# Create route if not exist
-ROUTE=$(oc get routes --field-selector='metadata.name=che-plugin-registry' 2>&1)
-if [[ "$ROUTE" == "No resources found." ]]; then
   echo "Creating route..."
   oc create route edge --service=che-plugin-registry > /dev/null
+  echo "Waiting for deploy finish.."
+  sleep 10
 fi
-HOST=$(oc get routes --field-selector='metadata.name=che-plugin-registry'  -o=custom-columns=":.spec.host" | xargs)
-
-# Allow deploy to finish
-echo "Waiting for deploy finish.."
-sleep 10
 
 # Detect pod
 POD_NAME=$(oc get pods --output name | grep che-plugin-registry | awk -F "/" '{print $2}')

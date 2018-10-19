@@ -10,8 +10,7 @@ RUN yum -y update && yum -y install skopeo nodejs yarn patch git sudo
 RUN curl -sSL -o /usr/local/bin/umoci https://github.com/openSUSE/umoci/releases/download/v0.4.2/umoci.amd64 && chmod +x /usr/local/bin/umoci
 
 RUN curl -Lo /tmp/openshift-origin-client-tools.tar.gz https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
-RUN tar --strip 1 -zxf /tmp/openshift-origin-client-tools.tar.gz -C /tmp && rm -f /tmp/openshift-origin-client-tools.tar.gz
-ENV PATH=/tmp:${PATH}
+RUN tar --strip 1 -zxf /tmp/openshift-origin-client-tools.tar.gz -C /usr/local/bin && rm -f /tmp/openshift-origin-client-tools.tar.gz
 
 ENV NODEJS_VERSION=6 \
     NPM_RUN=start \
