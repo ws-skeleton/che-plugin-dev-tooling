@@ -17,7 +17,7 @@ oc login ${CHE_OSO_CLUSTER} --insecure-skip-tls-verify=${CHE_OSO_TRUST_CERTS} --
 REGISTRY=$(oc get svc --field-selector='metadata.name=che-plugin-registry' 2>&1)
 if [[ "$REGISTRY" == "No resources found." ]]; then
   echo "Creating registry..."
-  oc new-app mshaposh/che-plugin-registry > /dev/null
+  oc new-app eclipse/che-plugin-registry > /dev/null
 fi
 
 # Create route if not exist
