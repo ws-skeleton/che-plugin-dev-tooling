@@ -5,9 +5,13 @@ RUN curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.re
 # Install nodejs/npm/yarn
 RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
 
-RUN yum -y update && yum -y install skopeo nodejs yarn patch git sudo
+RUN yum -y update && yum -y install skopeo nodejs yarn patch git sudo wget
 
 RUN curl -sSL -o /usr/local/bin/umoci https://github.com/openSUSE/umoci/releases/download/v0.4.2/umoci.amd64 && chmod +x /usr/local/bin/umoci
+
+RUN wget -O /tmp/openshift-origin-client-tools.tar.gz https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
+RUN tar --strip 1 -zxf /tmp/openshift-origin-client-tools.tar.gz -C /tmp && rm -f /tmp/openshift-origin-client-tools.tar.gz
+ENV PATH=/tmp:${PATH}
 
 ENV NODEJS_VERSION=6 \
     NPM_RUN=start \
@@ -43,5 +47,6 @@ RUN for f in "/home/user" "/etc/passwd" "/etc/group" "/projects"; do\
         > /home/user/group.template
 
 COPY ["entrypoint.sh","/home/user/entrypoint.sh"]
+COPY ["publish.sh", "/home/user/publish.sh"]
 ENTRYPOINT ["/home/user/entrypoint.sh"]
 CMD tail -f /dev/null
