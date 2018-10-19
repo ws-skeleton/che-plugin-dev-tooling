@@ -20,7 +20,7 @@ if [[ "$REGISTRY" == "No resources found." ]]; then
   oc new-app mshaposh/che-plugin-registry > /dev/null
 fi
 
-# Create route of not exist
+# Create route if not exist
 ROUTE=$(oc get routes --field-selector='metadata.name=che-plugin-registry' 2>&1)
 if [[ "$ROUTE" == "No resources found." ]]; then
   echo "Creating route..."
