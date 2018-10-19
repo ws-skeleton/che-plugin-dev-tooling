@@ -30,7 +30,7 @@ HOST=$(oc get routes --field-selector='metadata.name=che-plugin-registry'  -o=cu
 
 # Allow deploy to finish
 echo "Waiting for deploy finish.."
-sleep 8
+sleep 10
 
 # Detect pod
 POD_NAME=$(oc get pods --output name | grep che-plugin-registry | awk -F "/" '{print $2}')
