@@ -32,7 +32,9 @@ RUN mkdir /node_modules
 # Adding user to the 'root' is a workaround for https://issues.jboss.org/browse/CDK-305
 RUN echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     useradd -u 1000 -G users,wheel,root -d /home/user --shell /bin/bash -m user && \
-    usermod -p "*" user
+    usermod -p "*" user && \
+    # Defines the root /node_modules as the folder to use by yarn
+    echo '"--*.modules-folder" "/node_modules"' > /home/user/.yarnrc
 
 USER user
 
@@ -48,9 +50,7 @@ RUN for f in "/home/user" "/etc/passwd" "/etc/group" "/projects" "/node_modules"
         # Generate group.template \
         cat /etc/group | \
         sed s#root:x:0:#root:x:0:0,\${USER_ID}:#g \
-        > /home/user/group.template && \
-        # Defines the root /node_modules as the folder to use by yarn
-        echo '"--*.modules-folder" "/node_modules"' > $HOME/.yarnrc
+        > /home/user/group.template
 
 COPY ["entrypoint.sh","/home/user/entrypoint.sh"]
 ENTRYPOINT ["/home/user/entrypoint.sh"]
