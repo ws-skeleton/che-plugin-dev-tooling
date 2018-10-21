@@ -17,6 +17,7 @@ ENV NODEJS_VERSION=6 \
     NPM_CONFIG_PREFIX=$HOME/.npm-global
 
 COPY ["docker_build.sh","/usr/local/bin/docker_build"]
+COPY ["publish.sh", "/usr/local/bin/publish_plugin"]
 
 WORKDIR /projects
 
@@ -46,6 +47,5 @@ RUN for f in "/home/user" "/etc/passwd" "/etc/group" "/projects"; do\
         > /home/user/group.template
 
 COPY ["entrypoint.sh","/home/user/entrypoint.sh"]
-COPY ["publish.sh", "/home/user/publish.sh"]
 ENTRYPOINT ["/home/user/entrypoint.sh"]
 CMD tail -f /dev/null
