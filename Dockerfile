@@ -5,7 +5,7 @@ RUN curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.re
 # Install nodejs/npm/yarn
 RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
 
-RUN yum -y update && yum -y install skopeo nodejs yarn patch git sudo
+RUN yum install -y epel-release && yum install -y git jq nodejs patch skopeo sudo yarn
 
 RUN curl -sSL -o /usr/local/bin/umoci https://github.com/openSUSE/umoci/releases/download/v0.4.2/umoci.amd64 && chmod +x /usr/local/bin/umoci
 

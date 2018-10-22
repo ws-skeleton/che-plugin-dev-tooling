@@ -42,10 +42,12 @@ REGISTRY=$(oc get svc --field-selector='metadata.name=che-plugin-registry' 2>&1)
 if [[ "$REGISTRY" == "No resources found." ]]; then
   echo "Deploying a local Che Plugin Registry..."
   oc new-app eclipse/che-plugin-registry > /dev/null
-  echo "Creating route..."
-  oc create route edge --service=che-plugin-registry > /dev/null
   echo "Waiting for deploy finish.."
   sleep 20
+  echo "Creating route..."
+  oc create route edge --service=che-plugin-registry > /dev/null
+  echo "Waiting for route to be active..."
+  sleep 10
 fi
 
 HOST=$(oc get routes --field-selector='metadata.name=che-plugin-registry'  -o=custom-columns=":.spec.host" | xargs)
