@@ -16,7 +16,7 @@ PLUGIN_TYPE=$3
 if [[ "$PLUGIN_TYPE" == "theia" ]]; then
   PLUGIN="${PLUGIN_ID//-/_}.theia"
   PLUGIN_PATH="/projects/${PLUGIN_ID}/${PLUGIN}"
-  PLUGIN_TYPE_EXT="Theia Plugin"
+  PLUGIN_TYPE_EXT="Theia plugin"
 elif [[ "$PLUGIN_TYPE" == "che" ]]; then
   PLUGIN="${PLUGIN_ID}.tar.gz"
   PLUGIN_PATH="/projects/${PLUGIN_ID}/assembly/${PLUGIN}"
