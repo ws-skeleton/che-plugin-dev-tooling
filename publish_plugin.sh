@@ -1,30 +1,32 @@
 #!/bin/bash
 set -e
 
-# Prerequisites
-if [ "$#" -ne 3 ]; then
-  echo "ERROR: Illegal number of parameters"
-  echo "Usage:"
-  echo "   publish.sh <plugin-id> <plugin-version> <plugin-type>"
+function extract_plugin_metdata {
+  local METATDATA_JSON=$1
+  PLUGIN_ID=$(jq -r '.name'<"${METATDATA_JSON}")
+  PLUGIN_VERSION=$(jq -r '.version'<"${METATDATA_JSON}")
+  PLUGIN_TYPE=$(jq -r '.keywords[0]'<"${METATDATA_JSON}")
+}
+
+PACKAGE_JSON=${PACKAGE_JSON:-"./package.json"}
+if [ ! -f "${PACKAGE_JSON}" ]; then
+  echo "ERROR: File ${PACKAGE_JSON} not found."
+  echo "Cannot extract plugin metadata"
   exit 1
 fi
 
-PLUGIN_ID=$1
-PLUGIN_VERSION=$2
-PLUGIN_TYPE=$3
+extract_plugin_metdata "${PACKAGE_JSON}"
 
-if [[ "$PLUGIN_TYPE" == "theia" ]]; then
+if [[ "$PLUGIN_TYPE" == "theia-plugin" ]]; then
   PLUGIN="${PLUGIN_ID//-/_}.theia"
   PLUGIN_PATH="/projects/${PLUGIN_ID}/${PLUGIN}"
   PLUGIN_TYPE_EXT="Theia Plugin"
-elif [[ "$PLUGIN_TYPE" == "che" ]]; then
+elif [[ "$PLUGIN_TYPE" == "che-plugin" ]]; then
   PLUGIN="${PLUGIN_ID}.tar.gz"
   PLUGIN_PATH="/projects/${PLUGIN_ID}/assembly/${PLUGIN}"
   PLUGIN_TYPE_EXT="Che Plugin"
 else
-  echo "ERROR: Bad plugin type. Allowed type are \"che\" or \"theia\""
-  echo "Usage:"
-  echo "   publish.sh <plugin-id> <plugin-version> <plugin-type>"
+  echo "ERROR: Bad plugin type (${PLUGIN_TYPE}). Allowed type are \"che-plugin\" or \"theia-plugin\""
   exit 1
 fi
 
@@ -35,7 +37,7 @@ if [ ! -f "${PLUGIN_PATH}" ]; then
 fi
 
 # Login
-oc login ${CHE_OSO_CLUSTER} --insecure-skip-tls-verify=${CHE_OSO_TRUST_CERTS} --token=${CHE_OSO_USER_TOKEN} && oc project ${CHE_OSO_PROJECT}
+oc login "${CHE_OSO_CLUSTER}" --insecure-skip-tls-verify="${CHE_OSO_TRUST_CERTS}" --token="${CHE_OSO_USER_TOKEN}" && oc project "${CHE_OSO_PROJECT}"
 
 # Start registry if not exist
 REGISTRY=$(oc get svc --field-selector='metadata.name=che-plugin-registry' 2>&1)
@@ -58,14 +60,13 @@ POD_NAME=$(oc get pods --output name | grep che-plugin-registry | awk -F "/" '{p
 echo "Registry pod is: $POD_NAME"
 
 # Create folder
-oc exec $POD_NAME -- mkdir -p /var/www/html/plugins/$PLUGIN_ID/$PLUGIN_VERSION
+oc exec "${POD_NAME}" -- mkdir -p /var/www/html/plugins/"${PLUGIN_ID}"/"${PLUGIN_VERSION}"
 
 # Upload binary
-oc cp "${PLUGIN_PATH}" $POD_NAME:/var/www/html/plugins/$PLUGIN_ID/$PLUGIN_VERSION
-
+oc cp "${PLUGIN_PATH}" "${POD_NAME}":/var/www/html/plugins/"${PLUGIN_ID}"/"${PLUGIN_VERSION}"
 
 # Print binary link
-echo "Plugin hosted at: $BINARY_URL"
+echo "Plugin hosted at: ${BINARY_URL}"
 
 # Create & Upload meta.yaml
 cat > meta.yaml <<EOF
@@ -79,7 +80,7 @@ icon: https://www.eclipse.org/che/images/ico/16x16.png
 url: $BINARY_URL
 EOF
 
-oc cp ./meta.yaml $POD_NAME:/var/www/html/plugins/$PLUGIN_ID/$PLUGIN_VERSION
+oc cp ./meta.yaml "${POD_NAME}":/var/www/html/plugins/"${PLUGIN_ID}"/"${PLUGIN_VERSION}"
 
 # Print meta link
 META_URL="https://$HOST/plugins/$PLUGIN_ID/$PLUGIN_VERSION/meta.yaml"

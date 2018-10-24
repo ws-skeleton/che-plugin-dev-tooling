@@ -27,6 +27,12 @@ if ! grep -Fq "${USER_ID}" /etc/passwd; then
     sed "s/\${USER_ID}/${USER_ID}/g" | \
     sed "s/\${GROUP_ID}/${GROUP_ID}/g" | \
     sed "s/\${HOME}/\/home\/user/g" > /etc/group
+
+    cat ${HOME}/subuid.template | \
+    sed "s/\${USER_ID}/${USER_ID}/g" > /etc/subuid
+
+    cat ${HOME}/subgid.template | \
+    sed "s/\${USER_ID}/${USER_ID}/g" > /etc/subgid
 fi
 
 exec "$@"
