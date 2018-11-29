@@ -65,6 +65,25 @@ RUN mkdir /tmp/buildah && \
 RUN curl -Lo /tmp/openshift-origin-client-tools.tar.gz https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
 RUN tar --strip 1 -zxf /tmp/openshift-origin-client-tools.tar.gz -C /usr/local/bin && rm -f /tmp/openshift-origin-client-tools.tar.gz
 
+ARG JAVA_VERSION=1.8.0
+
+ENV JAVA_HOME=/usr/lib/jvm/java-${JAVA_VERSION}
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+RUN yum -y update && \
+    yum -y install \
+    centos-release-scl \
+    java-${JAVA_VERSION}-openjdk-devel && \
+    rh-maven33 \
+    yum clean all \
+    cat /opt/rh/rh-maven33/enable >> /home/user/.bashrc
+
+ENV M2_HOME=/opt/rh/rh-maven33/root/usr/share/maven \
+    TOMCAT_HOME=/home/user/tomcat8 \
+    TERM=xterm
+ENV PATH=$M2_HOME/bin:$PATH
+
+ENV MAVEN_OPTS='-Xmx512m'
 
 ENV NODEJS_VERSION=6 \
     NPM_RUN=start \
